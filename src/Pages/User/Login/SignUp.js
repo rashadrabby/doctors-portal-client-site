@@ -1,18 +1,18 @@
-import React from 'react';
-import { useCreateUserWithEmailAndPassword, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
+import React, { useState } from 'react';
+import { useCreateUserWithEmailAndPassword, useSendPasswordResetEmail, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import auth from '../../../firebase.init';
 import Loading from '../../Shared/Loading';
 
 const SignUp = () => {
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-    const navigate=useNavigate();
+    const [email, setEmail] = useState('');
+    const navigate = useNavigate();
     const [createUserWithEmailAndPassword, user, loading, error,] = useCreateUserWithEmailAndPassword(auth);
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
+    const [sendPasswordResetEmail] = useSendPasswordResetEmail(auth);
 
     let signInError;
 
@@ -37,8 +37,9 @@ const SignUp = () => {
     }
 
     const handlePassReset = () => {
-        // sendPasswordResetEmail(auth, email)
-        //     .then(() => { })
+        
+        sendPasswordResetEmail(auth, email)
+            .then(() => { })
     }
 
     return (

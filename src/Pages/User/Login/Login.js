@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import auth from '../../../firebase.init';
-import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
-import { Link } from 'react-router-dom';
+import { useSendPasswordResetEmail, useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Loading from '../../Shared/Loading';
 
 
 const Login = () => {
-
+    const [email, setEmail] = useState('');
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
+    const [sendPasswordResetEmail] = useSendPasswordResetEmail(auth);
     const [signInWithEmailAndPassword, user, loading, error,] = useSignInWithEmailAndPassword(auth);
 
     let signInError;
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
 
     if (user || gUser) {
+        navigate(from, { replace: true });
         console.log(gUser, user);
     }
 
@@ -32,8 +37,8 @@ const Login = () => {
     }
 
     const handlePassReset = () => {
-        // sendPasswordResetEmail(auth, email)
-        //     .then(() => { })
+        sendPasswordResetEmail(auth, email)
+            .then(() => { })
     }
 
 
