@@ -1,17 +1,22 @@
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from 'react-query';
+import Loading from '../Shared/Loading';
 import BookingModal from './BookingModal';
 import Service from './Service';
 
 const AvailableAppointments = ({ date }) => {
-    const [services, setServices] = useState([]);
     const [treatment, setTreatment] = useState(null)
 
-    useEffect(() => {
-        fetch('https://obscure-shore-90672.herokuapp.com/services')
+    const formattedDate = format(date, 'PP');
+    const { data: services, isLoading, refetch } = useQuery(['available', formattedDate], () =>
+        fetch(`https://obscure-shore-90672.herokuapp.com/available?date=${formattedDate}`)
             .then(res => res.json())
-            .then(data => setServices(data));
-    }, []);
+    )
+    if (isLoading) {
+        return <Loading />
+    }
+
     return (
         <div>
             <div className='text-center py-12'>
@@ -31,6 +36,7 @@ const AvailableAppointments = ({ date }) => {
                 date={date}
                 treatment={treatment}
                 setTreatment={setTreatment}
+                refetch={refetch}
             />}
         </div>
     );
