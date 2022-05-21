@@ -3,21 +3,23 @@ import { useCreateUserWithEmailAndPassword, useSendPasswordResetEmail, useSignIn
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import auth from '../../../firebase.init';
+import useToken from '../../../Hooks/useToken';
 import Loading from '../../Shared/Loading';
 
 const SignUp = () => {
     const [email, setEmail] = useState('');
-    const navigate = useNavigate();
     const [createUserWithEmailAndPassword, user, loading, error,] = useCreateUserWithEmailAndPassword(auth);
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [sendPasswordResetEmail] = useSendPasswordResetEmail(auth);
+    const navigate = useNavigate();
+    const [token] = useToken(user || gUser);
 
     let signInError;
 
-    if (user || gUser) {
-        console.log(user);
+    if (token) {
+        navigate('/appointment');
     }
 
     if (loading || gLoading || updating) {
@@ -25,25 +27,24 @@ const SignUp = () => {
     }
 
     if (error || gError || updateError) {
-        signInError = <p className='text-red-500 text-center'><small>{error?.message || gError?.error.message || updateError?.error.message}</small> </p>
+        signInError = <p className='text-red-500 text-center'><small>{error?.message || gError?.message || updateError?.message}</small> </p>
     }
 
     const onSubmit = async data => {
         console.log(data);
         createUserWithEmailAndPassword(data.email, data.password);
         await updateProfile({ displayName: data.name });
-        navigate('/appointment');
         console.log("Updated");
     }
 
     const handlePassReset = () => {
-        
+
         sendPasswordResetEmail(auth, email)
             .then(() => { })
     }
 
     return (
-        <div className='flex h-96 justify-center items-center mt-24'>
+        <div className='flex h-96 justify-center items-center mt-40'>
             <div className="card w-96 bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h2 className="text-center text-2xl">Sign Up</h2>

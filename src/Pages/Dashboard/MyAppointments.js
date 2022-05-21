@@ -1,16 +1,33 @@
+import { signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useNavigate } from 'react-router-dom';
 import auth from '../../firebase.init';
 
 const MyAppointments = () => {
     const [user] = useAuthState(auth)
     const [appointments, setAppointments] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (user) {
-            fetch(`https://obscure-shore-90672.herokuapp.com/booking?patient=${user.email}`)
-                .then(res => res.json())
-                .then(data => setAppointments(data));
+            fetch(`https://obscure-shore-90672.herokuapp.com/booking?patient=${user.email}`, {
+                method: 'GET',
+                headers: {
+                    'authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                }
+            })
+                .then(res => {
+                    if (res.status === 401 || res.status === 403) {
+                        navigate('/');
+                        signOut(auth);
+                        localStorage.removeItem('accessToken');
+                    }
+                    return res.json()
+                })
+                .then(data => {
+                    setAppointments(data);
+                });
         }
     }, [user])
     return (
@@ -29,8 +46,8 @@ const MyAppointments = () => {
                     </thead>
                     <tbody>
                         {
-                            appointments.map((a,index)=> <tr key={index}>
-                                <th>{index +1}</th>
+                            appointments.map((a, index) => <tr key={index}>
+                                <th>{index + 1}</th>
                                 <td>{a.patientName}</td>
                                 <td>{a.treatment}</td>
                                 <td>{a.date}</td>

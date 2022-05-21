@@ -12,7 +12,7 @@ const Banner = () => {
                 <div className='text-left'>
                     <h1 className="text-5xl font-bold float">Your New Smile Starts Here</h1>
                     <p className="py-6 pr-12">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-                    <PrimaryButton> <Link to='/signup'>Get Started</Link></PrimaryButton>
+                    <Link to='/signup'><PrimaryButton>Get Started</PrimaryButton></Link>
                 </div>
             </div>
         </div>
